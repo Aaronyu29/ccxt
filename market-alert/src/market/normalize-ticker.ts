@@ -25,5 +25,6 @@ export function normalizeTicker(
     source,
     bid: ticker.bid,
     ask: ticker.ask,
+    quoteVolume: Number.isFinite(Number(ticker.quoteVolume)) ? Number(ticker.quoteVolume) : undefined,
   };
 }

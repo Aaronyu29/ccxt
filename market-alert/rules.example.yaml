@@ -1,5 +1,7 @@
 statePath: data/market-alert.sqlite
-logPrices: true
+logPrices: false
+topLogLimit: 200
+topLogIntervalMs: 60000
 logPath: data/logs/crypto-monitor.out.log
 logRetentionDays: 7
 logMaxBytes: 52428800

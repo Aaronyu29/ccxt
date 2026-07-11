@@ -11,4 +11,5 @@ export interface PriceEvent {
   source: 'watchTickers' | 'watchMarkPrices' | 'watchTicker' | 'simulation';
   bid?: number;
   ask?: number;
+  quoteVolume?: number;
 }

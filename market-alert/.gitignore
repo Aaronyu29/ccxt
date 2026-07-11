@@ -20,5 +20,6 @@ data/*.sqlite
 data/*.sqlite-*
 data/*.db
 data/*.db-*
+data/crypto-alert.pid
 *.log
 *.log.*
