@@ -40,6 +40,10 @@ export const outputSchema = z.discriminatedUnion('type', [
 export const configSchema = z.object({
   statePath: z.string().min(1).default('data/market-alert.sqlite'),
   logPrices: z.boolean().default(true),
+  logPath: z.string().min(1).default('data/logs/crypto-monitor.out.log'),
+  logRetentionDays: z.number().int().positive().default(7),
+  logMaxBytes: z.number().int().positive().default(50 * 1024 * 1024),
+  retentionDays: z.number().int().positive().default(7),
   rules: z.array(ruleSchema).min(1),
   outputs: z.record(z.string(), outputSchema),
 });

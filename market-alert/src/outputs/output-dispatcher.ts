@@ -2,15 +2,15 @@ import PQueue from 'p-queue';
 import { appendFile } from 'node:fs/promises';
 import type { AlertEvent } from '../types/alert-event.js';
 import type { Config, OutputConfig } from '../config/schema.js';
-import { ConsoleOutput, type AlertOutput } from './console-output.js';
+import { ConsoleOutput, type AlertLogger, type AlertOutput } from './console-output.js';
 import { WebhookOutput } from './webhook-output.js';
 
 export class OutputDispatcher {
   private readonly queue = new PQueue({ concurrency: 4 });
   private readonly outputs = new Map<string, AlertOutput>();
 
-  constructor(config: Config) {
-    for (const [id, output] of Object.entries(config.outputs)) this.outputs.set(id, createOutput(output));
+  constructor(config: Config, logger: AlertLogger = console) {
+    for (const [id, output] of Object.entries(config.outputs)) this.outputs.set(id, createOutput(output, logger));
   }
 
   enqueue(alert: AlertEvent, outputIds: string[]): void {
@@ -39,6 +39,6 @@ export class OutputDispatcher {
   }
 }
 
-function createOutput(config: OutputConfig): AlertOutput {
-  return config.type === 'console' ? new ConsoleOutput() : new WebhookOutput(config);
+function createOutput(config: OutputConfig, logger: AlertLogger): AlertOutput {
+  return config.type === 'console' ? new ConsoleOutput(logger) : new WebhookOutput(config);
 }

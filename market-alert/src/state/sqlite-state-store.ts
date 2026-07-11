@@ -9,11 +9,13 @@ export interface PriceSample {
 
 export class SqliteStateStore {
   readonly db: Database.Database;
+  private maintenanceCounter = 0;
 
-  constructor(path: string) {
+  constructor(path: string, private readonly retentionMs = 7 * 24 * 60 * 60 * 1000) {
     if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
     this.db = new Database(path);
     this.db.pragma('journal_mode = WAL');
+    this.db.pragma('journal_size_limit = 4194304');
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS price_samples (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +56,11 @@ export class SqliteStateStore {
       prune.run(stateKey, sample.timestamp - retentionMs * 2);
     });
     transaction();
+    this.maintenanceCounter += 1;
+    if (this.maintenanceCounter >= 1000) {
+      this.maintenanceCounter = 0;
+      this.prune(sample.timestamp);
+    }
   }
 
   referenceAt(stateKey: string, timestamp: number): PriceSample | undefined {
@@ -112,9 +119,18 @@ export class SqliteStateStore {
       JSON.stringify(alert.metadata),
       JSON.stringify(alert.event),
     );
+    this.prune(alert.triggeredAt);
+  }
+
+  private prune(now: number): void {
+    const cutoff = now - this.retentionMs;
+    this.db.prepare('DELETE FROM price_samples WHERE timestamp < ?').run(cutoff);
+    this.db.prepare('DELETE FROM alerts WHERE triggered_at < ?').run(cutoff);
   }
 
   close(): void {
+    this.db.pragma('wal_checkpoint(TRUNCATE)');
+    this.db.exec('VACUUM');
     this.db.close();
   }
 }

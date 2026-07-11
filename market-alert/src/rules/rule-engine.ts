@@ -11,8 +11,8 @@ export class RuleEngine {
   private readonly state: RuleStateStore;
   private readonly rules: Array<{ config: RuleConfig; rule: Rule }>;
 
-  constructor(configs: RuleConfig[], statePath = ':memory:') {
-    const storage = new SqliteStateStore(statePath);
+  constructor(configs: RuleConfig[], statePath = ':memory:', retentionDays = 7) {
+    const storage = new SqliteStateStore(statePath, retentionDays * 24 * 60 * 60 * 1000);
     this.state = new RuleStateStore(storage);
     this.rules = configs.map((config) => ({
       config,
