@@ -1,0 +1,74 @@
+statePath: data/market-alert.sqlite
+logPrices: true
+
+outputs:
+  console:
+    type: console
+  webhook:
+    type: webhook
+    url: https://example.com/market-alert-webhook
+    timeoutMs: 5000
+    maxRetries: 3
+    backoffMs: 500
+    # hmacSecret: replace-me
+
+rules:
+  - id: btc-mark-target
+    exchange: binance
+    marketType: swap
+    symbols: [BTC/USDT:USDT]
+    priceType: markPrice
+    type: price_target
+    targetPrice: 58500
+    direction: below
+    resetPct: 0.5
+    cooldownMs: 3600000
+    outputs: [console, webhook]
+
+  - id: all-spot-5m-volatility
+    exchange: binance
+    marketType: spot
+    symbols: ['*']
+    priceType: last
+    type: price_change
+    windowMs: 300000
+    thresholdPct: 20
+    direction: any
+    cooldownMs: 900000
+    outputs: [console, webhook]
+
+  - id: all-swap-5m-volatility
+    exchange: binance
+    marketType: swap
+    symbols: ['*']
+    priceType: last
+    type: price_change
+    windowMs: 300000
+    thresholdPct: 20
+    direction: any
+    cooldownMs: 900000
+    outputs: [console, webhook]
+
+  - id: all-spot-10m-volatility
+    exchange: binance
+    marketType: spot
+    symbols: ['*']
+    priceType: last
+    type: price_change
+    windowMs: 600000
+    thresholdPct: 30
+    direction: any
+    cooldownMs: 1800000
+    outputs: [console, webhook]
+
+  - id: all-swap-10m-volatility
+    exchange: binance
+    marketType: swap
+    symbols: ['*']
+    priceType: last
+    type: price_change
+    windowMs: 600000
+    thresholdPct: 30
+    direction: any
+    cooldownMs: 1800000
+    outputs: [console, webhook]

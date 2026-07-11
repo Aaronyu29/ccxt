@@ -1,0 +1,24 @@
+node_modules/
+dist/
+dead-letter.jsonl
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local.yaml
+*.local.yml
+rule.yaml
+*.local.json
+keys.local.json
+secrets/
+*.secret
+*.secret.*
+
+# Runtime state and logs
+data/*.sqlite
+data/*.sqlite-*
+data/*.db
+data/*.db-*
+*.log
+*.log.*
